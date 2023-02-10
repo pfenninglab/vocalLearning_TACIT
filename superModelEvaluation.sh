@@ -1,5 +1,6 @@
 filterPeak=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/d2_model_prediction/step7_filterPeakName.py
 convChName=/home/ikaplow/RegulatoryElementEvolutionProject/src/RegElEvoCode/convertChromNames.py
+extendPeak=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/putamen/extendPeak.py
 
 # Evaluation 1: rat liver specific
 /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/ratModel/additionalEvaluate/ratModel_evaluate_2_negative_validationC_500p.bed 
@@ -16,6 +17,16 @@ convChName=/home/ikaplow/RegulatoryElementEvolutionProject/src/RegElEvoCode/conv
 # Evaluation 5: bat cortex specific
 /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/ratModel/ratEvaluate56/batCortexNeg/ratModel_val7_batCortex_negative_validate_500bp.bed
 /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/ratModel/ratEvaluate56/batCortexPos/ratModel_val7_batCortex_positive_validate_500bp.bed
+# Evaluation 6: rat specifc enhancer
+/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/evaluation/ratSpecific/evaluation6_rat_specific_negative_500.bed
+/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/evaluation/ratSpecific/evaluation6_rat_specific_positive_500.bed
+# Evaluation 7: macaque specific enhancer
+/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/evaluation/macaqueSpecific/evaluation7_macaque_specific_negative_500.bed
+/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/evaluation/macaqueSpecific/evaluation7_macaque_specific_positive_500.bed
+# Evaluation 8: bat specific enhancer
+/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/evaluation/batSpecific/evaluation8_bat_specific_negative_500.bed
+/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/evaluation/batSpecific/evaluation8_bat_specific_positive_500.bed
+
 
 # Evaluation 6: Rat specific enhancer
 
@@ -51,6 +62,11 @@ macaqueValidation=/projects/pfenninggroup/machineLearningForComputationalBiology
 python $filterPeak --unfilteredPeakFileName rat_nonEnhancer_overlap.bed --peakListFileName $macaqueValidation --unfilteredPeakNameCol 3 \
 --outputFileName evaluation6_rat_specific_negative.bed
 
+python $extendPeak expand_peaks -i evaluation6_rat_specific_negative.bed \
+-o evaluation6_rat_specific_negative_500.bed -l 500
+
+python $extendPeak expand_peaks -i evaluation6_rat_specific_positive.bed \
+-o evaluation6_rat_specific_positive_500.bed -l 500
 
 # Evaluation 7: Macaque specific enhancer
 
@@ -82,6 +98,12 @@ python $filterPeak --unfilteredPeakFileName macaque_nonEnhancer_overlap.bed --pe
 --outputFileName evaluation7_macaque_specific_negative.bed
 
 
+python $extendPeak expand_peaks -i evaluation7_macaque_specific_negative.bed \
+-o evaluation7_macaque_specific_negative_500.bed -l 500
+
+python $extendPeak expand_peaks -i evaluation7_macaque_specific_positive.bed \
+-o evaluation7_macaque_specific_positive_500.bed -l 500
+
 # Evaluation 8: Bat specific enhancer
 
 # positive: bat enhancer intersects rat, intersects macaque
@@ -101,8 +123,60 @@ bedtools intersect -a $ratToBat -b $macaqueToBat > bat_nonEnhancer_overlap.bed
 python $filterPeak --unfilteredPeakFileName bat_nonEnhancer_overlap.bed --peakListFileName $ratValidation --unfilteredPeakNameCol 3 \
 --outputFileName evaluation8_bat_specific_negative.bed
 
+python $extendPeak expand_peaks -i evaluation8_bat_specific_negative.bed \
+-o evaluation8_bat_specific_negative_500.bed -l 500
+
+python $extendPeak expand_peaks -i evaluation8_bat_specific_positive.bed \
+-o evaluation8_bat_specific_positive_500.bed -l 500
+
+
+# evaluations 9-11 (from rat model)
+# positive: putamen not cortex
+# negative: cortex not putamen
 
 
 
+#Evaluation in rat shared by macaque and rat
+# counter glires evaluations. 
+# positives: map macaque to rat, overlap rat, remove bat
+# map shared set to bat and remove bat, filter from rat.
+# negatives: map bat to rat, remove rat, map bat to macaque. remove macaque. overlap. 
+# evaluation 12
 
+## Macaque mapped to rat
+macaqueToRat=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/positiveTrain/macaque/Macaca_mulatta_MapTo_Rattus_norvegicus_halper.narrowpeak
+ratEnhancer=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/positiveTrain/rat/rat_putamen_enhancer.bed
+ratValidate=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/positiveTrain/rat/rat_putamen_positive_validate.bed
+## overlap rat
+bedtools intersect -a $ratEnhancer -b $macaqueToRat -wa > rat_OverlapMacaque.bed
+
+## remove bat
+sbatch ~/codes/mapPeak.sh -i rat_OverlapMacaque.bed -f Rattus_norvegicus -t Rousettus_aegyptiacus
+
+python $filterPeak --unfilteredPeakFileName rat_OverlapMacaque.bed --peakListFileName $ratValidate --unfilteredPeakNameCol 3 \
+--outputFileName rat_overlapMacaque_validate.bed 
+python $filterPeak --unfilteredPeakFileName rat_overlapMacaque_validate.bed --peakListFileName Rattus_norvegicus_MapTo_Rousettus_aegyptiacus_halper.narrowpeak --unfilteredPeakNameCol 3 \
+--removePeaks --outputFileName counterGlires_positive.bed 
+python $extendPeak expand_peaks -i counterGlires_positive.bed \
+-o evaluation_12_counterGlires_positive_500.bed -l 500
+
+sort -u -k1,1 -k2,2n -k3,3n -k10,10n counterGlires_positive.bed > tmp.bed
+#negative
+batToRat=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/positiveTrain/batPositive/tmpFiles/Rousettus_aegyptiacusMapToRattus_norvegicus_halper.narrowpeak
+bedtools intersect -a $batToRat -b $ratEnhancer -v > batToRat_filterRat.bed
+batTomacaque=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/negativeTrain/macaqueNegative/batToMacaque/batToMacaque_filtered.bed
+
+python $filterPeak --unfilteredPeakFileName batToRat_filterRat.bed --peakListFileName $batTomacaque --unfilteredPeakNameCol 3 \
+--outputFileName bat_filterRatMacaque_overlap.bed 
+
+while IFS=$'\t' read -r -a array; do
+if [ "${array[0]}" = "chr3" ] || [ "${array[0]}" = "chr5" ]; then
+echo ${array[@]} | tr " " "\t" >>  counterGlires_negative_test.bed
+elif [ "${array[0]}" = "chr8" ] || [ "${array[0]}" = "chr16" ]; then
+echo ${array[@]} | tr " " "\t" >>  counterGlires_negative_validate.bed
+fi
+done < bat_filterRatMacaque_overlap.bed
+
+python $extendPeak expand_peaks -i counterGlires_negative_validate.bed \
+-o evaluation_12_counterGlires_negative_500.bed -l 500
 

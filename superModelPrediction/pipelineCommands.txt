@@ -1,0 +1,101 @@
+cat \
+/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/superModelPredict/macaqueMapMammal/macaque_filterRat_putamenEnhancer_gb.Macaca_mulattaToZiphius_cavirostris.HALPER.narrowPeak
+
+
+extendDir=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/superModelPredict/extendPeak
+
+for i in Zalophus_californianus Zapus_hudsonius Ziphius_cavirostris; do
+	macaque=macaqueMapMammal/*${i}*;
+	rat=ratMapMammal/*${i}*;
+	bat=batMapMammal/*${i}*;
+	echo $macaque;
+	echo $rat;
+	echo $bat;
+	cat $macaque $rat $bat > mergedMap/${i}.enhancerMapped.bed
+	python $extendPeak expand_peaks -i mergedMap/${i}.enhancerMapped.bed \
+	-o extendPeak/${i}_extended.bed -l 500
+	echo "finished";
+done
+
+
+
+ls *.bed| wc -l
+
+extendPeak=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/putamen/extendPeak.py
+
+
+bedtools getfasta -nameOnly -fi /projects/pfenninggroup/machineLearningForComputationalBiology/halLiftover_chains/data/raw_data/2bit/fasta/Macaca_mulatta.fa \
+-bed /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/positiveTrain/first/macaquePutamen_Genbank.bed \
+-fo tmp_enhancerMapped.fa
+
+
+macaque=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/positiveTrain/macaque/halper/macaque_putamen_enhancer_genbank.bed
+bat=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenData/superModel/positiveTrain/batPositive/bat_putamen_cactus.bed
+
+python $extendPeak expand_peaks -i $macaque \
+-o extendPeak/Macaca_mulatta_extended.bed -l 500
+python $extendPeak expand_peaks -i $bat \
+-o extendPeak/Rousettus_aegyptiacus_extended.bed -l 500
+
+filterFasta=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/d2_model_prediction/filterNFasta.py
+
+for i in Macaca_mulatta Rousettus_aegyptiacus_extended.bed Zalophus_californianus Zapus_hudsonius Ziphius_cavirostris; do
+	fasta=/projects/pfenninggroup/machineLearningForComputationalBiology/halLiftover_chains/data/raw_data/2bit/fasta/${i}.fa
+	echo $fasta;
+	bedtools getfasta -nameOnly -fi $fasta \
+	-bed extendPeak/${i}_extended.bed \
+	-fo fasta/${i}_enhancerMapped.fa
+	echo "finished";
+	python $filterFasta --inputFasta fasta/${i}_enhancerMapped.fa \
+	--outputFasta fasta/${i}_enhancerMapped_filtered.fa
+done
+
+for i in Rousettus_aegyptiacus Ziphius_cavirostris; do
+	fasta=/projects/pfenninggroup/machineLearningForComputationalBiology/halLiftover_chains/data/raw_data/2bit/fasta/${i}.fa
+	echo $fasta;
+	bedtools getfasta -nameOnly -fi $fasta \
+	-bed extendPeak/${i}_extended.bed \
+	-fo fasta/${i}_enhancerMapped.fa
+	echo "finished";
+	python $filterFasta --inputFasta fasta/${i}_enhancerMapped.fa \
+	--outputFasta fasta/${i}_enhancerMapped_filtered.fa
+done
+
+fasta=/projects/pfenninggroup/machineLearningForComputationalBiology/halLiftover_chains/data/raw_data/2bit/fasta/Rousettus_aegyptiacus.fa
+bedtools getfasta -nameOnly -fi $fasta \
+	-bed extendPeak/Rousettus_aegyptiacus_extended.bed \
+	-fo fasta/Rousettus_aegyptiacus_enhancerMapped.fa
+python $filterFasta --inputFasta Rousettus_aegyptiacus_enhancerMapped.fa \
+--outputFasta Rousettus_aegyptiacus_enhancerMapped_filtered.fa
+
+/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/superModelPredict/prediction
+
+
+python3 -c "from numpy import load;print(len(load('Ziphius_cavirostris_predict.npy')))" 
+
+##generate gene names from filtered fasta files
+for i in *.fa;do 
+name=$(echo $i |cut -d "_" -f 1,2 )
+echo $name
+grep ">" $i > ../geneName/${name}.txt
+done
+
+##run python to generate matrix
+prediction=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/superModelPredict/prediction
+gene=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/superModelPredict/fasta/geneName
+python step4_generateMatrix.py --nameDir $gene --npyDir $prediction --output tmpMatrix.tsv
+
+
+python step4_generateMatrix.py --nameDir $gene --npyDir $prediction --output superModelPredictMatrix.csv
+
+##remove first line for species list
+head -n 1 matrix > species.txt
+sed '1d' matrix > matrix_modifited
+
+
+filterPeak=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/d2_model_prediction/step7_filterPeakName.py
+filterPeak=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/d2_model_prediction/step7_filterPeakName.py
+
+human=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/superModelPredict/mergedMap/Homo_sapiens.enhancerMapped.bed
+python $filterPeak --unfilteredPeakFileName $human --peakListFileName ocrlist.txt --unfilteredPeakNameCol 3 \
+--peakNameCol 0 --outputFileName human_ocr_ortholog.bed

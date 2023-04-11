@@ -1,0 +1,19 @@
+# rat SVM model scripts
+
+bedtools=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/putamen/bedtools
+rat=/projects/pfenninggroup/machineLearningForComputationalBiology/regElEvoGrant/RatGenome/rn6.fa
+
+# get positive/negative datasets for SVM
+$bedtools getfasta -fi $rat -bed rat_pos_train_1p.narrowpeak -fo rat_pos_train_svm.fa
+$bedtools getfasta -fi $rat -bed rat_neg_train_1p.narrowpeak -fo rat_neg_train_svm.fa
+
+$bedtools getfasta -fi $rat -bed rat_pos_validate_1p.narrowpeak -fo rat_pos_val_svm.fa
+$bedtools getfasta -fi $rat -bed rat_neg_validate_1p.narrowpeak -fo rat_neg_val_svm.fa
+
+#filter sequence with N
+filter=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/d2_model_prediction/filterNFasta.py
+python $filter --inputFasta rat_pos_train_svm.fa --outputFasta rat_pos_train_svm_filter.fa --threshold 0
+python $filter --inputFasta rat_neg_train_svm.fa --outputFasta rat_neg_train_svm_filter.fa --threshold 0
+
+python $filter --inputFasta rat_pos_val_svm.fa --outputFasta rat_pos_val_svm_filter.fa --threshold 0
+python $filter --inputFasta rat_neg_val_svm.fa --outputFasta rat_neg_val_svm_filter.fa --threshold 0

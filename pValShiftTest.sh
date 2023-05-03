@@ -14,6 +14,9 @@ function usage()
     echo "-r optional; remove temporary files"
     echo "-o output directory"
     echo "-n optional; file name in case of duplication"
+    echo "Inputs: permulation matrix, target species peak coordiantes, target species transcription start site, list of interested genes"
+    echo "Outputs: Ranksum test significance for p value distribution, plot of p value distribution"
+    echo "Requires plotWilcoxon.py"
 }
 
 outName=""

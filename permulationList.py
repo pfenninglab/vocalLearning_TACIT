@@ -16,12 +16,15 @@ if __name__ == '__main__':
 	parser.add_argument('-t', '--threshold', required=True, help="threshold used to filter peaks by p-values")
 	parser.add_argument('-p', '--permulation', required=False, help="value append to Missing_Trials column")
 	parser.add_argument('-m', '--matrix', required=False, help="prediction matrix if wants to get filered, expect tsv, expect NO header")
+	parser.add_argument('-n', '--colName', required=False, help="column name for p value")
 	parser.add_argument('-o', '--output', required=True, help="output file name, e.g. perm10k")
 	
 	args = parser.parse_args()
 	df = pd.read_csv(args.input)
-	# Assume designated p column is "Exp_Pvalue"
-	df = df.loc[df['Exp_Pvalue'] <= float(args.threshold)] 
+	if args.colName is not None:
+		df = df.loc[df[args.colName] <= float(args.threshold)]
+	else:
+		df = df.loc[df['Exp_Pvalue'] <= float(args.threshold)] 
 
 	if args.permulation is not None:
 		df['Missing_Trials'] = args.permulation

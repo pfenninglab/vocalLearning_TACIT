@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH -p pool1
-#SBATCH --job-name=phylolm
+#SBATCH --job-name=perm10k
 #SBATCH --cpus-per-task=1
-#SBATCH --error=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenPermulation/longevity/log/phylo_err_%A_%a.txt
-#SBATCH --output=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenPermulation/longevity/log/phylo_%A_%a.txt
+#SBATCH --error=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenPermulation/longevity/log/perm10k_err_%A_%a.txt
+#SBATCH --output=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenPermulation/longevity/log/perm10k_%A_%a.txt
 #SBATCH --mem=4G
-#SBATCH --time=10:00:00
-#SBATCH --array=1-1
+#SBATCH --time=72:00:00
+#SBATCH --array=1-100%50
 source ~/.bashrc
 conda activate hal
 
@@ -16,8 +16,9 @@ tree="/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearni
 preds="/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenPermulation/superModelPredictMatrixRevised.tsv"
 species="/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenPermulation/species.txt"
 traits="/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/superModelPredict/longevity/LQ_ZoonomiaBoreoeutheria.txt"
-out="/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenPermulation/longevity/longevity_phylolm_result.csv"
+out="/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenPermulation/longevity/perm10k/longevity_perm_10k_result.csv"
+perm="/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenPermulation/longevity/perm10k_list.csv"
 
-Rscript /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/TACIT/ocr_phylolm.r \
-$tree $preds $species $traits $out ${SLURM_ARRAY_TASK_ID} 1 \
-0 $seed Longevity 
+Rscript /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/TACIT/ocr_phylolm_conditional.r \
+$tree $preds $species $traits $out ${SLURM_ARRAY_TASK_ID} 100 \
+$perm $seed Longevity 

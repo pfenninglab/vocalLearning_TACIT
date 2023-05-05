@@ -1,0 +1,38 @@
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/TACIT/compute_perm_pvals_conditional.py longevity_phylolm_result_r1_s-768319551.csv 1 perm1k longevity_perm_1k_computedP.csv
+
+sh /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/putamen/parsePermulationList.sh -i longevity_perm_1k_computedP.csv -t 0.05 -p 9000 -o perm10k_list.csv
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/putamen/permulationList.py -i longevity_perm_1k_computedP.csv -t 0.05 -p 9000 -o perm10k_list.csv
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/TACIT/compute_perm_pvals_conditional.py longevity_phylolm_result_r1_s-768319551.csv 2 perm1k perm10k longevity_perm_10k_computedP.csv
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/putamen/permulationList.py -i longevity_perm_10k_computedP.csv -t 0.005 -p 90000 -o perm100k_list.csv
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/TACIT/compute_perm_pvals_conditional.py longevity_phylolm_result_r1_s-768319551.csv 3 perm1k perm10k perm100k longevity_perm_100k_computedP.csv
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/putamen/permulationList.py -i longevity_perm_10k_computedP.csv -t 0.0005 -p 900000 -o perm_1m_list.csv
+
+# Filtering prediction Matrix to accommadate CPU memory
+
+preds=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/putamenPermulation/superModelPredictMatrixRevised.tsv
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/putamen/permulationList.py -i longevity_perm_10k_computedP.csv -t 0.0005 -p 900000 -m $preds -o perm_1m_tmp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

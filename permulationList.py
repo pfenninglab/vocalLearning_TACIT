@@ -2,7 +2,10 @@ import pandas as pd
 import argparse
 
 '''
-Used to generate peak list and filter prediction matrix for permulation 
+tianyul3@andrew.cmu.edu
+Used to filter peaks with significant p-values
+generates peak list with permulation trials
+
 Usage:
 
 python permulationList.py -i longevity_perm_10k_computedP.csv -t 0.0005 -p 900000 \

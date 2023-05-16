@@ -1,0 +1,36 @@
+# remove extra character from prediction file
+tr -d '>' > longevity_perm1m_parsed.csv
+
+# filter significant peaks
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/putamen/permulationList.py -i longevity_perm_1m_computedP.csv -t 0.05 -o longevity_great_foreground_005
+
+humanBed=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/superModelPredict/mergedMap/Homo_sapiens.enhancerMapped.bed
+
+filterPeak=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/d2_model_prediction/step7_filterPeakName.py
+
+# significant peaks in foreground
+python $filterPeak --unfilteredPeakFileName $humanBed --unfilteredPeakNameCol 3 \
+--peakListFileName longevity_great_foreground_005.csv --peakNameCol 0  --splitCharacterPeakList , \
+--outputFileName longevity_great_foreground_005.bed
+
+# all peaks with phylolm p values in background
+python $filterPeak --unfilteredPeakFileName $humanBed --unfilteredPeakNameCol 3 \
+--peakListFileName longevity_perm1m_parsed.csv  --peakNameCol 0  --splitCharacterPeakList , \
+--outputFileName longevity_great_background.bed
+
+# remove undocumented chromosomes
+awk -v OFS='\t' '{print $1"\t"$2"\t"$3}' longevity_great_foreground_005.bed|grep '^chr'  > longevity_great_foreground_005_corrected.bed
+
+awk -v OFS='\t' '{print $1"\t"$2"\t"$3}' longevity_great_background.bed|grep '^chr'  > longevity_great_background_corrected.bed
+
+# filter with less strict threshold
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/putamen/permulationList.py -i longevity_perm1m_parsed.csv -t 0.25 -o longevity_great_foreground_025
+
+python $filterPeak --unfilteredPeakFileName $humanBed --unfilteredPeakNameCol 3 \
+--peakListFileName longevity_great_foreground_025_peakList.csv --peakNameCol 0  --splitCharacterPeakList , \
+--outputFileName longevity_great_foreground_025.bed
+
+awk -v OFS='\t' '{print $1"\t"$2"\t"$3}' longevity_great_foreground_025.bed|grep '^chr'  > longevity_great_foreground_025_corrected.bed
+
+
+

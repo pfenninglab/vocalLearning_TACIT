@@ -1,6 +1,6 @@
 # tianyul3@andrew.cmu.edu
 # Usage: 
-# Rscript plotPDist.R csv_file output_file (optional)p_value_column_name
+# Rscript plotPDist.R input_csv_file output_plot_file (optional)p_value_column_name
 
 library(ggplot2)
 

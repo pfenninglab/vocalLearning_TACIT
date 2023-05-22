@@ -1,0 +1,26 @@
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/vocalLearning_TACIT/permulationList.py -i sleep_phylolm_result_r1_s1682012895.csv -t 2 -p 999 -o sleep_perm1k -n Pvalue
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/TACIT/compute_perm_pvals_conditional.py longevity_phylolm_result_r1_s-768319551.csv 2 perm1k perm10k longevity_perm_10k_computedP.csv
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/TACIT/compute_perm_pvals_conditional.py sleep_phylolm_result_r1_s1682012895.csv 1 perm1k sleep_perm1k_computeP.csv
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/vocalLearning_TACIT/permulationList.py -i sleep_perm1k_computeP.csv -m ../superModelPredictMatrixRevised.tsv -t 0.05 -p 9000 -o sleep_perm10k
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/TACIT/compute_perm_pvals_conditional.py sleep_phylolm_result_r1_s1682012895.csv 2 perm1k perm10k sleep_perm10k_computeP.csv
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/vocalLearning_TACIT/permulationList.py -i sleep_perm10k_computeP.csv -m ../superModelPredictMatrixRevised.tsv -t 0.005 -p 90000 -o sleep_perm100k
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/TACIT/compute_perm_pvals_conditional.py sleep_phylolm_result_r1_s1682012895.csv 3 perm1k perm10k perm100k sleep_perm100k_computeP.csv
+
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/vocalLearning_TACIT/permulationList.py -i sleep_perm100k_computeP.csv -m ../superModelPredictMatrixRevised.tsv -t 0.0005 -p 900000 -o sleep_perm1m
+
+
+
+
+
+
+
+
+
+

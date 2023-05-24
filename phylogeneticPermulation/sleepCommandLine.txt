@@ -1,3 +1,4 @@
+## phylolm and permulation
 
 python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/vocalLearning_TACIT/permulationList.py -i sleep_phylolm_result_r1_s1682012895.csv -t 2 -p 999 -o sleep_perm1k -n Pvalue
 
@@ -15,12 +16,16 @@ python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearn
 
 python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/vocalLearning_TACIT/permulationList.py -i sleep_perm100k_computeP.csv -m ../superModelPredictMatrixRevised.tsv -t 0.0005 -p 900000 -o sleep_perm1m
 
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/TACIT/compute_perm_pvals_conditional.py sleep_phylolm_result_r1_s1682012895.csv 4 perm1k perm10k perm100k perm1m sleep_perm1m_computeP.csv
+
+## MHR and plot
+
+conda activate hal
+
+Rscript /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/vocalLearning_TACIT/bhCorrection.R sleep_perm1m_computeP.csv sleep_perm1m_computeP_bh.csv Exp_Pvalue
+
+Rscript /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/vocalLearning_TACIT/plotPDist.R sleep_perm1m_computeP.csv sleep_perm1m_pdist.jpg Exp_Pvalue
 
 
-
-
-
-
-
-
-
+###
+# P value shift test

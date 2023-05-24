@@ -17,9 +17,9 @@ if (length(args) >= 3) {
 
 data <- read.csv(input)
 pVal <- data[[pName]]
-
+plotTitle <- paste("Distribution of P-values:", input)
 plot <- ggplot(data, aes(x = pVal)) +
   geom_histogram(binwidth = 0.01, fill = "lightblue", color = "black") +
-  labs(x = "P-values", y = "Count", title = "Distribution of P-values")
+  labs(x = "P-values", y = "Count", title = plotTitle)
 
 ggsave(output, plot, width = 6, height = 4)

@@ -27,5 +27,13 @@ Rscript /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLear
 Rscript /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/vocalLearning_TACIT/plotPDist.R sleep_perm1m_computeP.csv sleep_perm1m_pdist.jpg Exp_Pvalue
 
 
-###
-# P value shift test
+## get significant peak human ortholog
+python /projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/vocalLearning_TACIT/permulationList.py -i sleep_perm1m_computeP_bh.csv -t 0.05 -o sleep_perm1m_significant -n bh
+
+humanBed=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/data/superModelPredict/mergedMap/Homo_sapiens.enhancerMapped.bed
+
+filterPeak=/projects/pfenninggroup/machineLearningForComputationalBiology/VocalLearningTACIT/code/d2_model_prediction/step7_filterPeakName.py
+
+python $filterPeak --unfilteredPeakFileName $humanBed --unfilteredPeakNameCol 3 \
+--peakListFileName sleep_perm1m_significant_parsed.csv --peakNameCol 0  --splitCharacterPeakList , \
+--outputFileName sleep_perm1m_significant_humanOrtholog.bed

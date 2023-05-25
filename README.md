@@ -23,10 +23,9 @@ Generates training, validation, evaluation used in rat putamen model.
 
 
 ### Automated scripts
-* filterNFasta.py: Filter fasta files with 'N's.
-
-* halperMapPeak.sh: map peaks with halLiftover and HALPER.
-* pValShiftTest.sh: generate p-value distribution and run RankSum test.
+* TACIT pipelines: automate dataprocessing including filtering, plotting, and generating matrix with permulationList.py, plotPDist.R, bhCorrection.R, qValue.R, filterNFasta.py.
+* ATAC seq helpers: automate mapping peaks from halLiftover and HALPER with halperMapPeak.sh. Ortholog conversion for bat sequences with batFormatConvert.sh. 
+* Model Prediction interpretation: automate testing p value distribution shift comparing prediction and literature with pValShiftTest.sh and plotWilcoxon.py
 
 ### Dependencies
 * keras2-tf27.yml used for CNN training/predictions from [mouse_sst](https://github.com/pfenninglab/mouse_sst).

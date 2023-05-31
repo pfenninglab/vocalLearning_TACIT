@@ -28,6 +28,6 @@ Generates training, validation, evaluation used in rat putamen model.
 * Model Prediction interpretation: automate testing p value distribution shift comparing prediction and literature with pValShiftTest.sh and plotWilcoxon.py
 
 ### Dependencies
-* Conda environment: keras2-tf27.yml used for CNN training/predictions from [mouse_sst](https://github.com/pfenninglab/mouse_sst). For other scripts, use hal.yml.
-*  Most scripts require: filterPeakName.py from [OCROrthologPrediction](https://github.com/pfenninglab/OCROrthologPrediction); preprocessing.py from [atac_data_pipeline](https://github.com/pfenninglab/atac_data_pipeline); convertChromNames.py from [TACIT](https://github.com/pfenninglab/TACIT).
+* Conda environment: keras2-tf27.yml used for CNN training/predictions. For other scripts, use hal.yml.
+*  Most scripts require: filterPeakName.py from [OCROrthologPrediction](https://github.com/pfenninglab/OCROrthologPrediction); convertChromNames.py from [TACIT](https://github.com/pfenninglab/TACIT).
 *  Phyloenetic permulation, requires [TACIT](https://github.com/pfenninglab/TACIT).
